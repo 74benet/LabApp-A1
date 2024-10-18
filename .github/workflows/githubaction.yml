@@ -40,6 +40,15 @@ jobs:
         done
         echo "API ist erreichbar und gesund!"
 
+    - name: Wait for health check Spring /v1/dataset
+      run: |
+        echo "Warten auf den Health-Check von http://localhost:8080/v1/dataset..."
+        until curl -s http://localhost:8080/v1/dataset; do
+          echo "API ist noch nicht bereit. Warte 5 Sekunden..."
+          sleep 5
+        done
+        echo "API ist erreichbar und gesund!"
+
     # Schritt 4: Sende eine POST-Anfrage an http://localhost:8080/v1/result und prüfe auf Status 200 OK
     - name: Send POST request to /v1/result
       run: |
