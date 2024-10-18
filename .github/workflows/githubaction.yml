@@ -1,0 +1,50 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Schritt 1: Checkout des Repositorys
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # Schritt 2: Setze Docker Compose auf und starte die Container
+    - name: Set up Docker Compose
+      run: |
+        docker-compose -f docker-compose.yml up -d
+      # Stelle sicher, dass Docker Compose mit deinem Projekt funktioniert.
+
+    # Schritt 3: Warten, bis der Health-Check unter http://localhost:8081/health erreichbar ist
+    - name: Wait for health check
+      run: |
+        echo "Warten auf den Health-Check von http://localhost:8081/health..."
+        until curl -s http://localhost:8081/health; do
+          echo "API ist noch nicht bereit. Warte 5 Sekunden..."
+          sleep 5
+        done
+        echo "API ist erreichbar und gesund!"
+
+    # Schritt 4: Sende eine POST-Anfrage an http://localhost:8080/v1/result und prüfe auf Status 200 OK
+    - name: Send POST request to /v1/result
+      run: |
+        echo "Sende POST-Anfrage an /v1/result..."
+        http_code=$(curl -o /dev/null -s -w "%{http_code}" -X POST http://localhost:8080/v1/result)
+        if [ "$http_code" -eq 200 ]; then
+          echo "POST-Anfrage erfolgreich, Status 200 OK"
+        else
+          echo "POST-Anfrage fehlgeschlagen, Statuscode: $http_code"
+          exit 1
+        fi
+
+    # Schritt 5: Container herunterfahren
+    - name: Shut down Docker Compose
+      run: docker-compose -f docker-compose.yml down
