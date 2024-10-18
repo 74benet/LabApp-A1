@@ -1,0 +1,21 @@
+package org.example.nutzungszeitaufgabe;
+
+import org.example.nutzungszeitaufgabe.event.EventController;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+
+@SpringBootApplication
+public class EventApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EventApplication.class, args);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
