@@ -18,6 +18,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    # Installiere Docker Compose
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install docker-compose -y
+
     # Schritt 2: Setze Docker Compose auf und starte die Container
     - name: Set up Docker Compose
       run: |
